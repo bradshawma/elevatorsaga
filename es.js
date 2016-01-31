@@ -7,12 +7,14 @@ function init(elevators, floors) {
     elevator.on("idle", function() { // Check if there is a floor that needs an elevator
         if (needElevatorUp.length > 0 && needElevatorUp.length >= needElevatorDown.length) { // Determine if more waiting for up or down
             elevator.destinationQueue = needElevatorUp[0]; // Go to longest waiting floor
+            elevator.checkDestinationQueue(); // Update destination queue
             elevator.goingUpIndicator(true); // Set elevator indicator
             elevator.goingDownIndicator(false); // Set elevator indicator
             needElevatorUp.splice(0, 1); // Remove that floor from wait array
         } else {
             if (needElevatorDown.length > 0) { // Check if floor waiting for down elevator
                 elevator.destinationQueue = [needElevatorDown[0]]; // Go to longest waiting floor 
+                elevator.checkDestinationQueue(); // Update destination queue
                 elevator.goingUpIndicator(false); // Set elevator indicator
                 elevator.goingDownIndicator(true); // Set elevator indicator
                 needElevatorDown.splice(0, 1); // Remove that floor from wait array
@@ -24,19 +26,40 @@ function init(elevators, floors) {
             if (elevator.goingUpIndicator()) { // Confirm elevator is going up
                 elevator.destinationQueue.push(floorNum); // Add pressed floor to destination queue
                 elevator.destinationQueue.sort(function(a, b) {return a - b; }); // Sort destination queue in ascending order
+                elevator.checkDestinationQueue(); // Update destination queue
             } else {
                 elevator.goingUpIndicator = "true"; // Set elevator indicator
                 elevator.destinationQueue.push(floorNum); // Add pressed floor to destination queue
                 elevator.destinationQueue.sort(function(a, b) {return a - b; }); // Sort destination queue in ascending order
+                elevator.checkDestinationQueue(); // Update destination queue
             }
         } else if (floorNum < elevator.currentFloor) { // Confirm direction match
             if (elevator.goingDownIndicator()) { // Confirm elevator is going down
                 elevator.destinationQueue.push(floorNum); // Add pressed floor to destination queue
                 elevator.destinationQueue.sort(function(a, b) {return b - a; }); // Sort destination queue in ascending order
+                elevator.checkDestinationQueue(); // Update destination queue
             } else {
                 elevator.goingDownIndicator = "true"; // Set elevator indicator
                 elevator.destinationQueue.push(floorNum); // Add pressed floor to destination queue
                 elevator.destinationQueue.sort(function(a, b) {return b - a; }); // Sort destination queue in ascending order
+                elevator.checkDestinationQueue(); // Update destination queue
+            }
+        }
+    });
+    elevator.on("passing_floor", function(floorNum, direction) { // Check if elevator should stop
+        if (direction === "up") { // If elevator is moving up
+            if (needElevatorUp.indexOf(floorNum) !== -1) { // Check if floor needs an up 
+                elevator.destinationQueue.push(floorNum); // Add pressed floor to destination queue
+                elevator.destinationQueue.sort(function(a, b) {return a - b; }); // Sort destination queue in ascending order
+                elevator.checkDestinationQueue(); // Update destination queue
+                needElevatorUp.splice(0, 1); // Remove that floor from wait array
+            }
+        } else if (direction === "down") { // If elevator is moving down}
+            if (needElevatorDown.indexOf(floorNum) !== -1) { // Check if floor needs a down 
+                elevator.destinationQueue.push(floorNum); // Add pressed floor to destination queue
+                elevator.destinationQueue.sort(function(a, b) {return b - a; }); // Sort destination queue in ascending order
+                elevator.checkDestinationQueue(); // Update destination queue
+                needElevatorDown.splice(0, 1); // Remove that floor from wait array)
             }
         }
     });
