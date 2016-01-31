@@ -64,6 +64,12 @@ function init(elevators, floors) {
             }
         }
     });
+    elevator.on("stopped_at_floor", function() { // Reset indicators if needed
+        if (elevator.destinationQueue.length === 0) { // If there are no further destinations
+            elevator.goingUpIndicator("false");
+            elevator.goingDownIndicator("false");
+        }
+    });
     floor.on("up_button_pressed", function() { // Check if there's already an elevator coming down; if not, add to needElevator array
         if (needElevatorUp.indexOf(floor.floorNum) === -1) { //Floor is not currently in needElevator array, check if elevator is already going to pass by
             if (elevator.goingUpIndicator() || elevator.currentFloor() < floor.floorNum || Math.max.apply(Math, elevator.destinationQueue) >= floor.floorNum) { // Check if elevator is passing by
