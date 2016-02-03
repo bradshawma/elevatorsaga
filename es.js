@@ -71,16 +71,16 @@ function init(elevators, floors) {
         }
     });
     floor.on("up_button_pressed", function() { // Check if there's already an elevator coming down; if not, add to needElevator array
-        if (needElevatorUp.indexOf(floor.floorNum) === -1) { //Floor is not currently in needElevator array, check if elevator is already going to pass by
+        if (needElevatorUp.indexOf(floor.floorNum()) === -1) { //Floor is not currently in needElevator array, check if elevator is already going to pass by
             if (elevator.goingUpIndicator() || elevator.currentFloor() < floor.floorNum || Math.max.apply(Math, elevator.destinationQueue) >= floor.floorNum) { // Check if elevator is passing by
-                needElevatorUp.push(floor.floorNum); // No elevator is coming by, add to needElevator
+                needElevatorUp.push(floor.floorNum()); // No elevator is coming by, add to needElevator
             }
         }
     });
     floor.on("down_button_pressed", function() { // Check if there's already an elevator coming down; if not, add to needElevator array
-        if (needElevatorDown.indexOf(floor.floorNum) === -1) { //Floor is not currently in needElevator array, check if elevator is already going to pass by
+        if (needElevatorDown.indexOf(floor.floorNum()) === -1) { //Floor is not currently in needElevator array, check if elevator is already going to pass by
             if (elevator.goingDownIndicator() || elevator.currentFloor() > floor.floorNum || Math.min.apply(Math, elevator.destinationQueue) <= floor.floorNum) {
-                needElevatorDown.push(floor.floorNum); // No elevator is coming by, add to needElevator
+                needElevatorDown.push(floor.floorNum()); // No elevator is coming by, add to needElevator
             }
         }
     });
